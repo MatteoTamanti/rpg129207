@@ -24,7 +24,7 @@ public class Player {
         double provvisorioX = playerX + dx;
         double provvisorioY = playerY + dy;
 
-        //controllo bordo destro
+        //controllo bordo destro e sinistro
         if (provvisorioX > limiteX) {
             playerX = limiteX;
         } else if (provvisorioX < 0) {
@@ -34,7 +34,7 @@ public class Player {
             }
 
 
-                //controllo bordo superiore
+                //controllo bordo superiore e inferiore
                 if (provvisorioY > limiteY) {
                     playerY = limiteY;
                 } else if (provvisorioY < 0) {
