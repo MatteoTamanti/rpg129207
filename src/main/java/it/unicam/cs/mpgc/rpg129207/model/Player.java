@@ -5,7 +5,11 @@ Il giocatore deve avere dei life points e un attacco e può interagire con npc, 
  Il giocatore soprattutto deve avere una posizione nella mappa.
 */
 
-public class Player {
+import java.io.Serializable;
+
+public class Player implements Serializable {
+    private static final long serialVersionUID = 1L; //versione 1 della classe + cast esplicito
+
     private int lifePoints;
     private int attack;
     private double playerX, playerY; //uso double per rendere il movimento fluido

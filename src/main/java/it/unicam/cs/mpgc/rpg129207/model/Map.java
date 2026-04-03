@@ -5,7 +5,11 @@ Per creare la mappa mi serve prima una matrice al cui interno
 delimiterò una mappa decidendo dove il personaggio può o non può andare (circa)
 */
 
-public class Map {
+import java.io.Serializable;
+
+public class Map implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private int [][] matrix;
     private int mapX;
     private int mapY;
