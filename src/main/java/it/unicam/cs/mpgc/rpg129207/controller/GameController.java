@@ -7,10 +7,7 @@ import it.unicam.cs.mpgc.rpg129207.model.Map;
 import it.unicam.cs.mpgc.rpg129207.model.Player;
 import it.unicam.cs.mpgc.rpg129207.view.GameView;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.HashSet;
 
 import javafx.animation.AnimationTimer;
@@ -76,6 +73,21 @@ public class GameController {
             System.out.println("Salvataggio effettuato!");
         } catch (IOException e) {
             System.err.println("Errore nel salvataggio!" + e.getMessage());
+        }
+    }
+
+    public static GameState loadState() {
+        File file = new File("savedState.json");
+        if (!file.exists()) {
+            System.err.println("Errore nel caricamento!");
+            return null;
+        }
+        try (java.io.FileReader reader = new java.io.FileReader(file)) {
+            Gson gson = new Gson();
+            return gson.fromJson(reader, GameState.class);
+        } catch (IOException e) {
+            System.err.println("Errore nel caricamento!" + e.getMessage());
+            return null;
         }
     }
 
