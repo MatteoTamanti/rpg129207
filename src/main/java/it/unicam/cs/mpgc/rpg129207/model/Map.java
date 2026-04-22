@@ -2,7 +2,7 @@ package it.unicam.cs.mpgc.rpg129207.model;
 
 /*
 Per creare la mappa mi serve prima una matrice al cui interno
-delimiterò una mappa decidendo dove il personaggio può o non può andare (circa)
+delimiterò una mappa decidendo dove il personaggio può o non può andare
 */
 
 import java.io.Serializable;

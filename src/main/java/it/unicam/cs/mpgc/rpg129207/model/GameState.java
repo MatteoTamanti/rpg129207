@@ -6,7 +6,6 @@ import java.util.List;
 
 
 //classe contenitore per la serializzazione delle classi del model
-
 public class GameState implements Serializable {
     private static final long serialVersionUID = 1L;
 

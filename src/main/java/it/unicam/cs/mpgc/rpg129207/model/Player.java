@@ -7,56 +7,56 @@ Il giocatore deve avere dei life points e un attacco e può interagire con npc, 
 
 import java.io.Serializable;
 
-public class Player implements Serializable {
-    private static final long serialVersionUID = 1L; //versione 1 della classe + cast esplicito
+public class Player extends Entity implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     private int lifePoints;
     private int attack;
-    private double playerX, playerY; //uso double per rendere il movimento fluido
 
-    public Player(int lifePoints, int attack, double playerX, double playerY) { //prendo i due attributi, perché intendo aggiungere più tipi di Player che l'user può scegliere
+    public Player(int lifePoints, int attack, double x, double y) {
+        super(x, y);
         this.lifePoints = lifePoints;
         this.attack = attack;
-        this.playerX = playerX;
-        this.playerY = playerY;
+    }
+
+    @Override
+    public void update(Map map) { //Per ora non fa niente
+
     }
 
     public void move(double dx, double dy, Map map) {
         double limiteX = map.getMapX() * map.getPixelPerCell();
         double limiteY = map.getMapY() * map.getPixelPerCell();
 
-        double provvisorioX = playerX + dx;
-        double provvisorioY = playerY + dy;
+        double provvisorioX = x + dx;
+        double provvisorioY = y + dy;
 
         //controllo bordo destro e sinistro
         if (provvisorioX > limiteX) {
-            playerX = limiteX;
+            x = limiteX;
         } else if (provvisorioX < 0) {
-                playerX = 0;
-            } else {
-                playerX = provvisorioX;
-            }
-
-
-                //controllo bordo superiore e inferiore
-                if (provvisorioY > limiteY) {
-                    playerY = limiteY;
-                } else if (provvisorioY < 0) {
-                    playerY = 0;
-                } else {
-                    playerY = provvisorioY;
-                }
-
-
-            }
-
-            public double getPlayerX () {
-                return playerX;
-            }
-
-            public double getPlayerY () {
-                return playerY;
-            }
-
+            x = 0;
+        } else {
+            x = provvisorioX;
         }
+
+        //controllo bordo superiore e inferiore
+        if (provvisorioY > limiteY) {
+            y = limiteY;
+        } else if (provvisorioY < 0) {
+            y = 0;
+        } else {
+            y = provvisorioY;
+        }
+    }
+
+    public double getPlayerX() {
+        return x;
+    }
+
+    public double getPlayerY() {
+        return y;
+    }
+
+}
 
