@@ -1,7 +1,6 @@
 package it.unicam.cs.mpgc.rpg129207.view;
 
 import it.unicam.cs.mpgc.rpg129207.model.Entity;
-import it.unicam.cs.mpgc.rpg129207.model.Player;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;

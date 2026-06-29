@@ -23,11 +23,11 @@ public class Main extends Application {
         if (savedData != null) {
             map = savedData.getMap();
             player = savedData.getPlayer();
-            System.out.println("Salvataggio caricato!");
+            System.out.println("Game saved");
         } else {
             map = new Map(20, 20);
             player = new Player(100, 10, 0, 0);
-            System.out.println("Nessun salvataggio trovato. Nuova partita.");
+            System.out.println("No save data found. New game.");
         }
 
         List<Entity> entities = new ArrayList<>();

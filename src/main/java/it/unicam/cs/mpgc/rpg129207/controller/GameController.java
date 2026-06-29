@@ -21,7 +21,7 @@ public class GameController {
     private Map map;
     private Player player;
     private List<Entity> entities;
-    private HashSet<KeyCode> pressedKeys; //uso un set perchè non voglio duplicati
+    private HashSet<KeyCode> pressedKeys;
     private AnimationTimer gameLoop;
     private GameView view;
 
@@ -36,7 +36,7 @@ public class GameController {
         createGameLoop();
     }
 
-    private void createGameLoop() { //per il momento il refresh rate è lo stesso dello schermo dell'user, il che non ha troppo senso, quindi va corretto
+    private void createGameLoop() {
         gameLoop = new AnimationTimer() {
             @Override
             public void handle(long now) {
@@ -54,16 +54,13 @@ public class GameController {
         if (pressedKeys.contains(KeyCode.D)) player.move(speed, 0, map);
 
         for (Entity e : entities) {
-            e.update(map);
+            e.update(map, player);
         }
 
         view.render();
     }
 
-    /*
-    preparo il GameController a ricevere input da Scene e aggiungerli al set
-    e aggiungo il tasto "P" per salvare
-     */
+
     public void connectKeyboard(Scene scene) {
         scene.setOnKeyPressed(event -> { pressedKeys.add(event.getCode());
             if (event.getCode() == KeyCode.P) {saveState();}
@@ -79,23 +76,23 @@ public class GameController {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
             gson.toJson(currentState, writer);
-            System.out.println("Salvataggio effettuato!");
+            System.out.println("Game saved");
         } catch (IOException e) {
-            System.err.println("Errore nel salvataggio!" + e.getMessage());
+            System.err.println("Error loading game" + e.getMessage());
         }
     }
 
     public static GameState loadState() {
         File file = new File("savedState.json");
         if (!file.exists()) {
-            System.err.println("Errore nel caricamento!");
+            System.err.println("Error loading game");
             return null;
         }
         try (java.io.FileReader reader = new java.io.FileReader(file)) {
             Gson gson = new Gson();
             return gson.fromJson(reader, GameState.class);
         } catch (IOException e) {
-            System.err.println("Errore nel caricamento!" + e.getMessage());
+            System.err.println("Error loading game" + e.getMessage());
             return null;
         }
     }
