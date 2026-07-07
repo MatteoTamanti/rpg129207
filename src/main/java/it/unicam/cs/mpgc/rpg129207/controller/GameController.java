@@ -9,38 +9,26 @@ import it.unicam.cs.mpgc.rpg129207.model.Player;
 import it.unicam.cs.mpgc.rpg129207.view.GameView;
 import java.io.*;
 import java.util.List;
-
-import javafx.animation.AnimationTimer;
 import javafx.scene.input.KeyCode;
 
 public class GameController {
     private Map map;
     private Player player;
     private List<Entity> entities;
-    private AnimationTimer gameLoop;
     private GameView view;
     private InputController inputController;
+    private GameLoop gameLoop;
 
 
     public GameController(Map map, Player player,  GameView view, List<Entity> entities, InputController inputController) {
         this.map = map;
         this.player = player;
         this.entities = entities;
-        this.entities.add(player);
         this.view = view;
         this.inputController  = inputController;
-
-        createGameLoop();
+        this.gameLoop = new GameLoop(this::updateGame);
     }
 
-    private void createGameLoop() {
-        gameLoop = new AnimationTimer() {
-            @Override
-            public void handle(long now) {
-                updateGame();
-            }
-        };
-    }
 
     private void updateGame() {
         double speed = 2.0;
@@ -87,8 +75,6 @@ public class GameController {
     }
 
     public void startLoop() {
-        if (gameLoop != null) {
-            gameLoop.start();
-        }
+        gameLoop.start();
     }
 }
