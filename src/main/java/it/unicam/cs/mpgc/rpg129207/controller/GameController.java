@@ -8,31 +8,28 @@ import it.unicam.cs.mpgc.rpg129207.model.Map;
 import it.unicam.cs.mpgc.rpg129207.model.Player;
 import it.unicam.cs.mpgc.rpg129207.view.GameView;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
 import javafx.animation.AnimationTimer;
-import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 
 public class GameController {
     private Map map;
     private Player player;
     private List<Entity> entities;
-    private HashSet<KeyCode> pressedKeys;
     private AnimationTimer gameLoop;
     private GameView view;
+    private InputController inputController;
 
 
-    public GameController(Map map, Player player,  GameView view, List<Entity> entities) {
+    public GameController(Map map, Player player,  GameView view, List<Entity> entities, InputController inputController) {
         this.map = map;
         this.player = player;
-        this.entities = new ArrayList<>();
+        this.entities = entities;
         this.entities.add(player);
-        this.pressedKeys = new HashSet<>();
         this.view = view;
+        this.inputController  = inputController;
+
         createGameLoop();
     }
 
@@ -48,24 +45,16 @@ public class GameController {
     private void updateGame() {
         double speed = 2.0;
 
-        if (pressedKeys.contains(KeyCode.W)) player.move(0, -speed, map);
-        if (pressedKeys.contains(KeyCode.S)) player.move(0, speed, map);
-        if (pressedKeys.contains(KeyCode.A)) player.move(-speed, 0, map);
-        if (pressedKeys.contains(KeyCode.D)) player.move(speed, 0, map);
+        if (inputController.isKeyPressed(KeyCode.W)) player.move(0, -speed, map);
+        if (inputController.isKeyPressed(KeyCode.S)) player.move(0, speed, map);
+        if (inputController.isKeyPressed(KeyCode.A)) player.move(-speed, 0, map);
+        if (inputController.isKeyPressed(KeyCode.D)) player.move(speed, 0, map);
 
         for (Entity e : entities) {
             e.update(map, player);
         }
 
         view.render();
-    }
-
-
-    public void connectKeyboard(Scene scene) {
-        scene.setOnKeyPressed(event -> { pressedKeys.add(event.getCode());
-            if (event.getCode() == KeyCode.P) {saveState();}
-        });
-        scene.setOnKeyReleased(event -> pressedKeys.remove(event.getCode()));
     }
 
 

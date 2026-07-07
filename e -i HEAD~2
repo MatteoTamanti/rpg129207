@@ -1,0 +1,145 @@
+[1mdiff --git a/.idea/.gitignore b/.idea/.gitignore[m
+[1mnew file mode 100644[m
+[1mindex 0000000..b58b603[m
+[1m--- /dev/null[m
+[1m+++ b/.idea/.gitignore[m
+[36m@@ -0,0 +1,5 @@[m
+[32m+[m[32m# Default ignored files[m
+[32m+[m[32m/shelf/[m
+[32m+[m[32m/workspace.xml[m
+[32m+[m[32m# Editor-based HTTP Client requests[m
+[32m+[m[32m/httpRequests/[m
+[1mdiff --git a/.idea/workspace.xml b/.idea/workspace.xml[m
+[1mindex 1b98c9c..d5fb91b 100644[m
+[1m--- a/.idea/workspace.xml[m
+[1m+++ b/.idea/workspace.xml[m
+[36m@@ -5,11 +5,12 @@[m
+   </component>[m
+   <component name="ChangeListManager">[m
+     <list default="true" id="abe13b70-69bc-4db0-aff2-53f8ad2ffbe4" name="Changes" comment="">[m
+[31m-      <change afterPath="$PROJECT_DIR$/src/main/java/it/unicam/cs/mpgc/rpg129207/model/Entity.java" afterDir="false" />[m
+[32m+[m[32m      <change afterPath="$PROJECT_DIR$/src/main/java/it/unicam/cs/mpgc/rpg129207/model/Enemy.java" afterDir="false" />[m
+[32m+[m[32m      <change afterPath="$PROJECT_DIR$/src/main/java/it/unicam/cs/mpgc/rpg129207/model/NPC.java" afterDir="false" />[m
+       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />[m
+[31m-      <change beforePath="$PROJECT_DIR$/savedState.json" beforeDir="false" />[m
+       <change beforePath="$PROJECT_DIR$/src/main/java/it/unicam/cs/mpgc/rpg129207/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/it/unicam/cs/mpgc/rpg129207/Main.java" afterDir="false" />[m
+       <change beforePath="$PROJECT_DIR$/src/main/java/it/unicam/cs/mpgc/rpg129207/controller/GameController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/it/unicam/cs/mpgc/rpg129207/controller/GameController.java" afterDir="false" />[m
+[32m+[m[32m      <change beforePath="$PROJECT_DIR$/src/main/java/it/unicam/cs/mpgc/rpg129207/model/Entity.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/it/unicam/cs/mpgc/rpg129207/model/Entity.java" afterDir="false" />[m
+       <change beforePath="$PROJECT_DIR$/src/main/java/it/unicam/cs/mpgc/rpg129207/model/GameState.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/it/unicam/cs/mpgc/rpg129207/model/GameState.java" afterDir="false" />[m
+       <change beforePath="$PROJECT_DIR$/src/main/java/it/unicam/cs/mpgc/rpg129207/model/Map.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/it/unicam/cs/mpgc/rpg129207/model/Map.java" afterDir="false" />[m
+       <change beforePath="$PROJECT_DIR$/src/main/java/it/unicam/cs/mpgc/rpg129207/model/Player.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/it/unicam/cs/mpgc/rpg129207/model/Player.java" afterDir="false" />[m
+[1mdiff --git a/src/main/java/it/unicam/cs/mpgc/rpg129207/Main.java b/src/main/java/it/unicam/cs/mpgc/rpg129207/Main.java[m
+[1mindex 621cdb6..7d3bb4b 100644[m
+[1m--- a/src/main/java/it/unicam/cs/mpgc/rpg129207/Main.java[m
+[1m+++ b/src/main/java/it/unicam/cs/mpgc/rpg129207/Main.java[m
+[36m@@ -23,11 +23,11 @@[m [mpublic class Main extends Application {[m
+         if (savedData != null) {[m
+             map = savedData.getMap();[m
+             player = savedData.getPlayer();[m
+[31m-            System.out.println("Salvataggio caricato!");[m
+[32m+[m[32m            System.out.println("Game saved");[m
+         } else {[m
+             map = new Map(20, 20);[m
+             player = new Player(100, 10, 0, 0);[m
+[31m-            System.out.println("Nessun salvataggio trovato. Nuova partita.");[m
+[32m+[m[32m            System.out.println("No save data found. New game.");[m
+         }[m
+ [m
+         List<Entity> entities = new ArrayList<>();[m
+[1mdiff --git a/src/main/java/it/unicam/cs/mpgc/rpg129207/controller/GameController.java b/src/main/java/it/unicam/cs/mpgc/rpg129207/controller/GameController.java[m
+[1mindex 20598f5..da29f8e 100644[m
+[1m--- a/src/main/java/it/unicam/cs/mpgc/rpg129207/controller/GameController.java[m
+[1m+++ b/src/main/java/it/unicam/cs/mpgc/rpg129207/controller/GameController.java[m
+[36m@@ -21,7 +21,7 @@[m [mpublic class GameController {[m
+     private Map map;[m
+     private Player player;[m
+     private List<Entity> entities;[m
+[31m-    private HashSet<KeyCode> pressedKeys; //uso un set perchè non voglio duplicati[m
+[32m+[m[32m    private HashSet<KeyCode> pressedKeys;[m
+     private AnimationTimer gameLoop;[m
+     private GameView view;[m
+ [m
+[36m@@ -36,7 +36,7 @@[m [mpublic class GameController {[m
+         createGameLoop();[m
+     }[m
+ [m
+[31m-    private void createGameLoop() { //per il momento il refresh rate è lo stesso dello schermo dell'user, il che non ha troppo senso, quindi va corretto[m
+[32m+[m[32m    private void createGameLoop() {[m
+         gameLoop = new AnimationTimer() {[m
+             @Override[m
+             public void handle(long now) {[m
+[36m@@ -54,16 +54,13 @@[m [mpublic class GameController {[m
+         if (pressedKeys.contains(KeyCode.D)) player.move(speed, 0, map);[m
+ [m
+         for (Entity e : entities) {[m
+[31m-            e.update(map);[m
+[32m+[m[32m            e.update(map, player);[m
+         }[m
+ [m
+         view.render();[m
+     }[m
+ [m
+[31m-    /*[m
+[31m-    preparo il GameController a ricevere input da Scene e aggiungerli al set[m
+[31m-    e aggiungo il tasto "P" per salvare[m
+[31m-     */[m
+[32m+[m
+     public void connectKeyboard(Scene scene) {[m
+         scene.setOnKeyPressed(event -> { pressedKeys.add(event.getCode());[m
+             if (event.getCode() == KeyCode.P) {saveState();}[m
+[36m@@ -79,23 +76,23 @@[m [mpublic class GameController {[m
+         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {[m
+             Gson gson = new GsonBuilder().setPrettyPrinting().create();[m
+             gson.toJson(currentState, writer);[m
+[31m-            System.out.println("Salvataggio effettuato!");[m
+[32m+[m[32m            System.out.println("Game saved");[m
+         } catch (IOException e) {[m
+[31m-            System.err.println("Errore nel salvataggio!" + e.getMessage());[m
+[32m+[m[32m            System.err.println("Error loading game" + e.getMessage());[m
+         }[m
+     }[m
+ [m
+     public static GameState loadState() {[m
+         File file = new File("savedState.json");[m
+         if (!file.exists()) {[m
+[31m-            System.err.println("Errore nel caricamento!");[m
+[32m+[m[32m            System.err.println("Error loading game");[m
+             return null;[m
+         }[m
+         try (java.io.FileReader reader = new java.io.FileReader(file)) {[m
+             Gson gson = new Gson();[m
+             return gson.fromJson(reader, GameState.class);[m
+         } catch (IOException e) {[m
+[31m-            System.err.println("Errore nel caricamento!" + e.getMessage());[m
+[32m+[m[32m            System.err.println("Error loading game" + e.getMessage());[m
+             return null;[m
+         }[m
+     }[m
+[1mdiff --git a/src/main/java/it/unicam/cs/mpgc/rpg129207/model/Enemy.java b/src/main/java/it/unicam/cs/mpgc/rpg129207/model/Enemy.java[m
+[1mindex dd9ad4b..13ecbb9 100644[m
+[1m--- a/src/main/java/it/unicam/cs/mpgc/rpg129207/model/Enemy.java[m
+[1m+++ b/src/main/java/it/unicam/cs/mpgc/rpg129207/model/Enemy.java[m
+[36m@@ -1,4 +1,23 @@[m
+ package it.unicam.cs.mpgc.rpg129207.model;[m
+ [m
+[31m-public class Enemy {[m
+[32m+[m[32mimport java.io.Serializable;[m
+[32m+[m
+[32m+[m[32mpublic class Enemy extends Entity implements Serializable {[m
+[32m+[m[32m    private static final long serialVersionUID = 1L;[m
+[32m+[m
+[32m+[m[32m    private int lifePoints;[m
+[32m+[m[32m    private int attack;[m
+[32m+[m
+[32m+[m[32m    public Enemy(int lifePoints, int attack, double x, double y) {[m
+[32m+[m[32m        super(x, y);[m
+[32m+[m[32m        this.lifePoints = lifePoints;[m
+[32m+[m[32m        this.attack = attack;[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m
+[32m+[m[32m    @Override[m
+[32m+[m[32m    public void update(Map map, Player player) {[m
+[32m+[m
+[32m+[m[32m    }[m
+[32m+

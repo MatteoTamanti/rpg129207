@@ -1,6 +1,7 @@
 package it.unicam.cs.mpgc.rpg129207;
 
 import it.unicam.cs.mpgc.rpg129207.controller.GameController;
+import it.unicam.cs.mpgc.rpg129207.controller.InputController;
 import it.unicam.cs.mpgc.rpg129207.model.GameState;
 import it.unicam.cs.mpgc.rpg129207.model.Map;
 import it.unicam.cs.mpgc.rpg129207.model.Player;
@@ -35,14 +36,20 @@ public class Main extends Application {
 
         GameView view = new GameView(entities);
 
-        GameController controller = new GameController(map, player, view, entities);
+        InputController inputController = new InputController();
+
+        GameController controller = new GameController(map, player, view, entities, inputController);
 
         Scene scene = new Scene(view.getRoot(), 800, 600);
-        controller.connectKeyboard(scene);
+
+        inputController.connectKeyboard(scene);
 
         primaryStage.setTitle("RPG Project");
+
         primaryStage.setScene(scene);
+
         primaryStage.show();
+
         controller.startLoop();
     }
 
