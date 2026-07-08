@@ -1,13 +1,11 @@
 package it.unicam.cs.mpgc.rpg129207.controller;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import it.unicam.cs.mpgc.rpg129207.model.Entity;
-import it.unicam.cs.mpgc.rpg129207.model.GameState;
 import it.unicam.cs.mpgc.rpg129207.model.Map;
 import it.unicam.cs.mpgc.rpg129207.model.Player;
+import it.unicam.cs.mpgc.rpg129207.persistence.GameState;
+import it.unicam.cs.mpgc.rpg129207.persistence.GameStateRepository;
 import it.unicam.cs.mpgc.rpg129207.view.GameView;
-import java.io.*;
 import java.util.List;
 import javafx.scene.input.KeyCode;
 
@@ -18,15 +16,21 @@ public class GameController {
     private GameView view;
     private InputController inputController;
     private GameLoop gameLoop;
+    private GameStateRepository gameStateRepository;
 
-
-    public GameController(Map map, Player player,  GameView view, List<Entity> entities, InputController inputController) {
+    public GameController(Map map, Player player,  GameView view, List<Entity> entities, InputController inputController, GameStateRepository gameStateRepository) {
         this.map = map;
         this.player = player;
         this.entities = entities;
         this.view = view;
         this.inputController  = inputController;
         this.gameLoop = new GameLoop(this::updateGame);
+        this.gameStateRepository = gameStateRepository;
+    }
+
+    private void saveGame() {
+        GameState state = new GameState(player, map);
+        gameStateRepository.save(state);
     }
 
 
@@ -38,40 +42,15 @@ public class GameController {
         if (inputController.isKeyPressed(KeyCode.A)) player.move(-speed, 0, map);
         if (inputController.isKeyPressed(KeyCode.D)) player.move(speed, 0, map);
 
+        if (inputController.consumeKey(KeyCode.P)) {
+            saveGame();
+        }
+
         for (Entity e : entities) {
             e.update(map, player);
         }
 
         view.render();
-    }
-
-
-    public void saveState() {
-        GameState currentState = new GameState(this.player, this.map);
-
-        File file = new File("savedState.json");
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            gson.toJson(currentState, writer);
-            System.out.println("Game saved");
-        } catch (IOException e) {
-            System.err.println("Error loading game" + e.getMessage());
-        }
-    }
-
-    public static GameState loadState() {
-        File file = new File("savedState.json");
-        if (!file.exists()) {
-            System.err.println("Error loading game");
-            return null;
-        }
-        try (java.io.FileReader reader = new java.io.FileReader(file)) {
-            Gson gson = new Gson();
-            return gson.fromJson(reader, GameState.class);
-        } catch (IOException e) {
-            System.err.println("Error loading game" + e.getMessage());
-            return null;
-        }
     }
 
     public void startLoop() {

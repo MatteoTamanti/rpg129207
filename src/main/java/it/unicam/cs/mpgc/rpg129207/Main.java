@@ -2,9 +2,10 @@ package it.unicam.cs.mpgc.rpg129207;
 
 import it.unicam.cs.mpgc.rpg129207.controller.GameController;
 import it.unicam.cs.mpgc.rpg129207.controller.InputController;
-import it.unicam.cs.mpgc.rpg129207.model.GameState;
 import it.unicam.cs.mpgc.rpg129207.model.Map;
 import it.unicam.cs.mpgc.rpg129207.model.Player;
+import it.unicam.cs.mpgc.rpg129207.persistence.GameState;
+import it.unicam.cs.mpgc.rpg129207.persistence.GameStateRepository;
 import it.unicam.cs.mpgc.rpg129207.view.GameView;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -19,7 +20,8 @@ public class Main extends Application {
     public void start(Stage primaryStage) {
         Map map;
         Player player;
-        GameState savedData = GameController.loadState();
+        GameStateRepository gameStateRepository = new GameStateRepository();
+        GameState savedData = gameStateRepository.load();
 
         if (savedData != null) {
             map = savedData.getMap();
@@ -38,7 +40,7 @@ public class Main extends Application {
 
         InputController inputController = new InputController();
 
-        GameController controller = new GameController(map, player, view, entities, inputController);
+        GameController controller = new GameController(map, player, view, entities, inputController, gameStateRepository);
 
         Scene scene = new Scene(view.getRoot(), 800, 600);
 

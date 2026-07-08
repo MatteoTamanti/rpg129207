@@ -12,6 +12,13 @@ public class InputController {
         this.pressedKeys = new HashSet<>();
     }
 
+    public boolean consumeKey(KeyCode key) {
+        if (pressedKeys.contains(key)) {
+            pressedKeys.remove(key);
+            return true;
+        } return false;
+    }
+
     public void connectKeyboard(Scene scene) {
         scene.setOnKeyPressed(event ->  pressedKeys.add(event.getCode()));
         scene.setOnKeyReleased(event -> pressedKeys.remove(event.getCode()));
