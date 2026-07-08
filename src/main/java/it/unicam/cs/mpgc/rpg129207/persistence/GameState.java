@@ -1,26 +1,36 @@
 package it.unicam.cs.mpgc.rpg129207.persistence;
 
+import it.unicam.cs.mpgc.rpg129207.model.Entity;
 import it.unicam.cs.mpgc.rpg129207.model.Map;
 import it.unicam.cs.mpgc.rpg129207.model.Player;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class GameState implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private Player player;
     private Map map;
+    private List<Entity> entities;
 
-    public GameState(Player player, Map map) {
-        this.player = player;
+    public GameState(Map map, List<Entity> entities) {
         this.map = map;
+        this.entities = entities;
     }
 
-    public Player getPlayer() {
-        return player;
-    }
     public Map getMap() {
         return map;
     }
 
+    public List<Entity> getEntities() {
+        return entities;
+    }
+
+    public Player getPlayer() {
+        for (Entity entity : entities) {
+            if (entity instanceof Player) {
+                return (Player) entity;
+            }
+        } throw new IllegalStateException("No player found in saved game");
+    }
 }

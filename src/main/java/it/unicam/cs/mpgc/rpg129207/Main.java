@@ -2,6 +2,7 @@ package it.unicam.cs.mpgc.rpg129207;
 
 import it.unicam.cs.mpgc.rpg129207.controller.GameController;
 import it.unicam.cs.mpgc.rpg129207.controller.InputController;
+import it.unicam.cs.mpgc.rpg129207.model.Entity;
 import it.unicam.cs.mpgc.rpg129207.model.Map;
 import it.unicam.cs.mpgc.rpg129207.model.Player;
 import it.unicam.cs.mpgc.rpg129207.persistence.GameState;
@@ -10,9 +11,9 @@ import it.unicam.cs.mpgc.rpg129207.view.GameView;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+
 import java.util.ArrayList;
 import java.util.List;
-import it.unicam.cs.mpgc.rpg129207.model.Entity;
 
 public class Main extends Application {
 
@@ -20,21 +21,25 @@ public class Main extends Application {
     public void start(Stage primaryStage) {
         Map map;
         Player player;
+        List<Entity> entities;
+
         GameStateRepository gameStateRepository = new GameStateRepository();
         GameState savedData = gameStateRepository.load();
 
         if (savedData != null) {
             map = savedData.getMap();
+            entities = savedData.getEntities();
             player = savedData.getPlayer();
-            System.out.println("Game saved");
+            System.out.println("Game loaded");
+
         } else {
+
             map = new Map(20, 20);
             player = new Player(100, 10, 0, 0);
+            entities = new ArrayList<>();
+            entities.add(player);
             System.out.println("No save data found. New game.");
         }
-
-        List<Entity> entities = new ArrayList<>();
-        entities.add(player);
 
         GameView view = new GameView(entities);
 
@@ -47,13 +52,12 @@ public class Main extends Application {
         inputController.connectKeyboard(scene);
 
         primaryStage.setTitle("RPG Project");
-
         primaryStage.setScene(scene);
-
         primaryStage.show();
 
         controller.startLoop();
     }
+
 
     public static void main(String[] args) {
         launch(args);

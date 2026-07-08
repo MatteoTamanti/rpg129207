@@ -29,10 +29,9 @@ public class GameController {
     }
 
     private void saveGame() {
-        GameState state = new GameState(player, map);
+        GameState state = new GameState(map, entities);
         gameStateRepository.save(state);
     }
-
 
     private void updateGame() {
         double speed = 2.0;
