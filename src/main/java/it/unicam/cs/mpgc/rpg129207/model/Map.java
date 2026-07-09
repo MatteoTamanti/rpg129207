@@ -5,35 +5,36 @@ import java.io.Serializable;
 public class Map implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private int [][] matrix;
+    private TileType[][] matrix;
     private int mapX;
     private int mapY;
-    private int pixelPerCell;
+    private int tileSize;
+
 
     public Map(int mapX, int mapY) {
         this.mapX = mapX;
         this.mapY = mapY;
-        matrix = new int [mapY][mapX];
-        this.pixelPerCell = 32;
+        this.tileSize = 32;
+        this.matrix = new TileType[mapY][mapX];
     }
 
-    public int getMapX() {
+    public int getWidth() {
         return mapX;
     }
-    public int getMapY() {
+
+    public int getHeight() {
         return mapY;
     }
 
-    public int getPixelPerCell() {
-        return pixelPerCell;
+    public int getTileSize() {
+        return tileSize;
     }
 
-    public int getCoord(int i, int j) {
-        return matrix[i][j];
+    public TileType getTile(int y, int x) {
+        return matrix[y][x];
     }
 
-    public void setCoord(int i, int j, int v) {
-        matrix[i][j] = v;
+    public void setTile(int y, int x, TileType tile) {
+        matrix[y][x] = tile;
     }
-
 }

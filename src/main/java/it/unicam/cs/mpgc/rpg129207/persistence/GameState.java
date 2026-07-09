@@ -3,7 +3,6 @@ package it.unicam.cs.mpgc.rpg129207.persistence;
 import it.unicam.cs.mpgc.rpg129207.model.Entity;
 import it.unicam.cs.mpgc.rpg129207.model.Map;
 import it.unicam.cs.mpgc.rpg129207.model.Player;
-
 import java.io.Serializable;
 import java.util.List;
 

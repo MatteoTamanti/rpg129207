@@ -4,6 +4,7 @@ import it.unicam.cs.mpgc.rpg129207.controller.GameController;
 import it.unicam.cs.mpgc.rpg129207.controller.InputController;
 import it.unicam.cs.mpgc.rpg129207.model.Entity;
 import it.unicam.cs.mpgc.rpg129207.model.Map;
+import it.unicam.cs.mpgc.rpg129207.model.MapGenerator;
 import it.unicam.cs.mpgc.rpg129207.model.Player;
 import it.unicam.cs.mpgc.rpg129207.persistence.GameState;
 import it.unicam.cs.mpgc.rpg129207.persistence.GameStateRepository;
@@ -34,14 +35,15 @@ public class Main extends Application {
 
         } else {
 
-            map = new Map(20, 20);
-            player = new Player(100, 10, 0, 0);
+            MapGenerator generator = new MapGenerator();
+            map = generator.generateMap();
+            player = new Player(100, 10, 70, 70);
             entities = new ArrayList<>();
             entities.add(player);
             System.out.println("No save data found. New game.");
         }
 
-        GameView view = new GameView(entities);
+        GameView view = new GameView(map, entities);
 
         InputController inputController = new InputController();
 

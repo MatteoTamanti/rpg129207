@@ -16,9 +16,7 @@ public class Player extends Entity implements Serializable {
 
     @Override
     public void update(Map map,  Player player) {
-
     }
-
 
     public double getPlayerX() {
         return x;
