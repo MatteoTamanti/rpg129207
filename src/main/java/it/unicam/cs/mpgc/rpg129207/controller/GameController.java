@@ -17,8 +17,9 @@ public class GameController {
     private InputController inputController;
     private GameLoop gameLoop;
     private GameStateRepository gameStateRepository;
+    private EnemySpawner enemySpawner;
 
-    public GameController(Map map, Player player,  GameView view, List<Entity> entities, InputController inputController, GameStateRepository gameStateRepository) {
+    public GameController(Map map, Player player,  GameView view, List<Entity> entities, InputController inputController, GameStateRepository gameStateRepository, EnemySpawner enemySpawner) {
         this.map = map;
         this.player = player;
         this.entities = entities;
@@ -26,6 +27,7 @@ public class GameController {
         this.inputController  = inputController;
         this.gameLoop = new GameLoop(this::updateGame);
         this.gameStateRepository = gameStateRepository;
+        this.enemySpawner = enemySpawner;
     }
 
     private void saveGame() {
@@ -48,6 +50,8 @@ public class GameController {
         for (Entity e : entities) {
             e.update(map, player);
         }
+
+        enemySpawner.update(player, entities);
 
         view.render();
     }

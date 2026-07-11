@@ -20,6 +20,7 @@ public class GameView {
     private final List<Entity> entities;
     private final java.util.Map<Entity, Rectangle> entityShapes;
     private final MapView mapView;
+    private final int tileSize;
 
     public GameView(Map map, List<Entity> entities, Player player, double viewportWidth, double viewportHeight) {
 
@@ -30,6 +31,8 @@ public class GameView {
         this.entityLayer = new Pane();
         this.entityShapes = new HashMap<>();
         this.mapView = new MapView(map);
+        this.tileSize = map.getTileSize();
+
 
         this.camera = new Camera(viewportWidth, viewportHeight, map.getWidth() * map.getTileSize(), map.getHeight() * map.getTileSize());
 
@@ -50,16 +53,21 @@ public class GameView {
     }
 
     public void render() {
-
         for (Entity entity : entities) {
-            Rectangle shape = entityShapes.get(entity);
+            Rectangle shape = entityShapes.computeIfAbsent(entity, e -> createShapeFor());
             shape.setX(entity.getX());
             shape.setY(entity.getY());
         }
-
         camera.update(player.getX(), player.getY());
-        world.setTranslateX(-camera.getX());
-        world.setTranslateY(-camera.getY());
+        world.setTranslateX(-Math.round(camera.getX()));
+        world.setTranslateY(-Math.round(camera.getY()));
+    }
+
+    private Rectangle createShapeFor() {
+        Rectangle shape = new Rectangle(tileSize, tileSize);
+        shape.setFill(Color.BLUEVIOLET);
+        entityLayer.getChildren().add(shape);
+        return shape;
     }
 
     public Pane getRoot() {

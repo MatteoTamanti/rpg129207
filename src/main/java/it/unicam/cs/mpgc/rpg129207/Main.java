@@ -1,5 +1,6 @@
 package it.unicam.cs.mpgc.rpg129207;
 
+import it.unicam.cs.mpgc.rpg129207.controller.EnemySpawner;
 import it.unicam.cs.mpgc.rpg129207.controller.GameController;
 import it.unicam.cs.mpgc.rpg129207.controller.InputController;
 import it.unicam.cs.mpgc.rpg129207.model.Entity;
@@ -26,6 +27,7 @@ public class Main extends Application {
         Map map;
         Player player;
         List<Entity> entities;
+        EnemySpawner enemySpawner;
 
         GameStateRepository gameStateRepository = new GameStateRepository();
         GameState savedData = gameStateRepository.load();
@@ -48,11 +50,14 @@ public class Main extends Application {
             System.out.println("No save data found. New game.");
         }
 
+        enemySpawner = new EnemySpawner(MapGenerator.ROOM2_X * map.getTileSize(), MapGenerator.ROOM2_Y * map.getTileSize(),
+                MapGenerator.ROOM_SIZE * map.getTileSize(), MapGenerator.ROOM_SIZE * map.getTileSize(), 1);
+
         GameView view = new GameView(map, entities, player, VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
 
         InputController inputController = new InputController();
 
-        GameController controller = new GameController(map, player, view, entities, inputController, gameStateRepository);
+        GameController controller = new GameController(map, player, view, entities, inputController, gameStateRepository, enemySpawner);
 
         Scene scene = new Scene(view.getRoot(), VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
 
