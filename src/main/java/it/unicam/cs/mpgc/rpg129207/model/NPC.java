@@ -5,8 +5,9 @@ import java.io.Serializable;
 public class NPC extends Entity implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    public NPC(double x, double y) {
-        super(x, y);
+    public NPC(double x, double y, String questText, double dungeonX, double dungeonY) {
+        super(x, y, 1, 0, 0);
+
     }
 
     @Override

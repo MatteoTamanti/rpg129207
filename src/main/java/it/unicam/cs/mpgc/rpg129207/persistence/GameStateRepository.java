@@ -78,9 +78,9 @@ public class GameStateRepository {
                 double y = Double.parseDouble(element.getElementsByTagName("y").item(0).getTextContent());
 
                 if (type.equals("Player")) {
-                    entities.add(new Player(100, 10, x, y));
+                    entities.add(new Player(100, 10, 0.5, x, y));
                 } else if (type.equals("Enemy")) {
-                    entities.add(new Enemy(30, 5, x, y));
+                    entities.add(new Enemy(30, 5, 1, x, y));
                 } else {
                     System.err.println("Unknown entity type: " + type);
                 }

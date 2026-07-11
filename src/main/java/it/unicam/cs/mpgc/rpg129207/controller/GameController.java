@@ -1,5 +1,6 @@
 package it.unicam.cs.mpgc.rpg129207.controller;
 
+import it.unicam.cs.mpgc.rpg129207.model.Enemy;
 import it.unicam.cs.mpgc.rpg129207.model.Entity;
 import it.unicam.cs.mpgc.rpg129207.model.Map;
 import it.unicam.cs.mpgc.rpg129207.model.Player;
@@ -18,8 +19,10 @@ public class GameController {
     private GameLoop gameLoop;
     private GameStateRepository gameStateRepository;
     private EnemySpawner enemySpawner;
+    private PlayerCombatHandler combatHandler;
 
-    public GameController(Map map, Player player,  GameView view, List<Entity> entities, InputController inputController, GameStateRepository gameStateRepository, EnemySpawner enemySpawner) {
+    public GameController(Map map, Player player,  GameView view, List<Entity> entities, InputController inputController,
+                          GameStateRepository gameStateRepository, EnemySpawner enemySpawner, PlayerCombatHandler combatHandler) {
         this.map = map;
         this.player = player;
         this.entities = entities;
@@ -28,6 +31,7 @@ public class GameController {
         this.gameLoop = new GameLoop(this::updateGame);
         this.gameStateRepository = gameStateRepository;
         this.enemySpawner = enemySpawner;
+        this.combatHandler = combatHandler;
     }
 
     private void saveGame() {
@@ -47,13 +51,21 @@ public class GameController {
             saveGame();
         }
 
+        combatHandler.update(player, entities, inputController);
+
         for (Entity e : entities) {
             e.update(map, player);
         }
 
+        removeDeadEnemies();
+
         enemySpawner.update(player, entities);
 
         view.render();
+    }
+
+    private void removeDeadEnemies() {
+        entities.removeIf(e -> e instanceof Enemy enemy && !enemy.isAlive() && view.removeEntity(enemy));
     }
 
     public void startLoop() {

@@ -3,6 +3,7 @@ package it.unicam.cs.mpgc.rpg129207;
 import it.unicam.cs.mpgc.rpg129207.controller.EnemySpawner;
 import it.unicam.cs.mpgc.rpg129207.controller.GameController;
 import it.unicam.cs.mpgc.rpg129207.controller.InputController;
+import it.unicam.cs.mpgc.rpg129207.controller.PlayerCombatHandler;
 import it.unicam.cs.mpgc.rpg129207.model.Entity;
 import it.unicam.cs.mpgc.rpg129207.model.Map;
 import it.unicam.cs.mpgc.rpg129207.model.MapGenerator;
@@ -43,7 +44,8 @@ public class Main extends Application {
             map = generator.generateMap();
 
             double[] spawn = generator.findCenterSpawn(map);
-            player = new Player(100, 10, spawn[0], spawn[1]);
+
+            player = new Player(100, 10, 0.5, spawn[0], spawn[1]);
 
             entities = new ArrayList<>();
             entities.add(player);
@@ -53,11 +55,13 @@ public class Main extends Application {
         enemySpawner = new EnemySpawner(MapGenerator.ROOM2_X * map.getTileSize(), MapGenerator.ROOM2_Y * map.getTileSize(),
                 MapGenerator.ROOM_SIZE * map.getTileSize(), MapGenerator.ROOM_SIZE * map.getTileSize(), 1);
 
+        PlayerCombatHandler combatHandler = new PlayerCombatHandler();
+
         GameView view = new GameView(map, entities, player, VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
 
         InputController inputController = new InputController();
 
-        GameController controller = new GameController(map, player, view, entities, inputController, gameStateRepository, enemySpawner);
+        GameController controller = new GameController(map, player, view, entities, inputController, gameStateRepository, enemySpawner, combatHandler);
 
         Scene scene = new Scene(view.getRoot(), VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
 

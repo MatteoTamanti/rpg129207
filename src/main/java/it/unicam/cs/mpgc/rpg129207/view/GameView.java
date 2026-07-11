@@ -63,6 +63,14 @@ public class GameView {
         world.setTranslateY(-Math.round(camera.getY()));
     }
 
+    public boolean removeEntity(Entity entity) {
+        Rectangle shape = entityShapes.remove(entity);
+        if (shape != null) {
+            entityLayer.getChildren().remove(shape);
+        }
+        return true;
+    }
+
     private Rectangle createShapeFor() {
         Rectangle shape = new Rectangle(tileSize, tileSize);
         shape.setFill(Color.BLUEVIOLET);

@@ -40,7 +40,7 @@ public class EnemySpawner {
 
     private void spawnEnemies(List<Entity> entities) {
         for (int i = 0; i < enemyCount; i++) {
-            entities.add(new Enemy(30, 5, triggerX + i * 32, triggerY));
+            entities.add(new Enemy(30, 5,1 ,  triggerX + i * 32, triggerY));
         }
     }
 }
