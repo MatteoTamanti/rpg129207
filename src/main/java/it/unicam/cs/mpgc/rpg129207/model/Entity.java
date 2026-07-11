@@ -7,6 +7,7 @@ public abstract class Entity implements Serializable {
     protected double size = 32;
 
     private int lifePoints;
+    private int maxLifePoints;
     private int attack;
     private final long attackCooldownNanos;
     private long lastAttackTime;
@@ -18,6 +19,7 @@ public abstract class Entity implements Serializable {
         this.attack = attack;
         this.attackCooldownNanos = (long) (attackCooldownSeconds * 1_000_000_000);
         this.lastAttackTime = 0;
+        this.maxLifePoints = lifePoints;
     }
 
     public void move(double dx, double dy, Map map) {
@@ -78,6 +80,8 @@ public abstract class Entity implements Serializable {
     public boolean isAlive() {
         return lifePoints > 0;
     }
+
+    public int getMaxLifePoints() { return maxLifePoints; }
 
     public abstract void update(Map map, Player player);
 

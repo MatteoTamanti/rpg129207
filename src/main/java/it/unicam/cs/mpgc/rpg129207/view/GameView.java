@@ -21,6 +21,8 @@ public class GameView {
     private final java.util.Map<Entity, Rectangle> entityShapes;
     private final MapView mapView;
     private final int tileSize;
+    private final EntityHealthBarRenderer healthBarRenderer;
+    private final PlayerHudView playerHud;
 
     public GameView(Map map, List<Entity> entities, Player player, double viewportWidth, double viewportHeight) {
 
@@ -32,8 +34,6 @@ public class GameView {
         this.entityShapes = new HashMap<>();
         this.mapView = new MapView(map);
         this.tileSize = map.getTileSize();
-
-
         this.camera = new Camera(viewportWidth, viewportHeight, map.getWidth() * map.getTileSize(), map.getHeight() * map.getTileSize());
 
         world.getChildren().add(mapView.getRoot());
@@ -50,6 +50,8 @@ public class GameView {
             entityShapes.put(entity, shape);
             entityLayer.getChildren().add(shape);
         }
+        this.healthBarRenderer = new EntityHealthBarRenderer(entityLayer, e -> e != player);
+        this.playerHud = new PlayerHudView(root);
     }
 
     public void render() {
@@ -58,6 +60,10 @@ public class GameView {
             shape.setX(entity.getX());
             shape.setY(entity.getY());
         }
+
+        healthBarRenderer.update(entities);
+        playerHud.update(player);
+
         camera.update(player.getX(), player.getY());
         world.setTranslateX(-Math.round(camera.getX()));
         world.setTranslateY(-Math.round(camera.getY()));
@@ -68,6 +74,8 @@ public class GameView {
         if (shape != null) {
             entityLayer.getChildren().remove(shape);
         }
+
+        healthBarRenderer.remove(entity);
         return true;
     }
 

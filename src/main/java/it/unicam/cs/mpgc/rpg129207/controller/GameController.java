@@ -18,11 +18,11 @@ public class GameController {
     private InputController inputController;
     private GameLoop gameLoop;
     private GameStateRepository gameStateRepository;
-    private EnemySpawner enemySpawner;
+    private List<EnemySpawner> enemySpawners;
     private PlayerCombatHandler combatHandler;
 
     public GameController(Map map, Player player,  GameView view, List<Entity> entities, InputController inputController,
-                          GameStateRepository gameStateRepository, EnemySpawner enemySpawner, PlayerCombatHandler combatHandler) {
+                          GameStateRepository gameStateRepository, List<EnemySpawner> enemySpawners, PlayerCombatHandler combatHandler) {
         this.map = map;
         this.player = player;
         this.entities = entities;
@@ -30,7 +30,7 @@ public class GameController {
         this.inputController  = inputController;
         this.gameLoop = new GameLoop(this::updateGame);
         this.gameStateRepository = gameStateRepository;
-        this.enemySpawner = enemySpawner;
+        this.enemySpawners = enemySpawners;
         this.combatHandler = combatHandler;
     }
 
@@ -59,7 +59,9 @@ public class GameController {
 
         removeDeadEnemies();
 
-        enemySpawner.update(player, entities);
+        for (EnemySpawner spawner : enemySpawners) {
+            spawner.update(player, entities);
+        }
 
         view.render();
     }

@@ -52,8 +52,16 @@ public class Main extends Application {
             System.out.println("No save data found. New game.");
         }
 
-        enemySpawner = new EnemySpawner(MapGenerator.ROOM2_X * map.getTileSize(), MapGenerator.ROOM2_Y * map.getTileSize(),
-                MapGenerator.ROOM_SIZE * map.getTileSize(), MapGenerator.ROOM_SIZE * map.getTileSize(), 1);
+        List<EnemySpawner> enemySpawners = List.of(
+                new EnemySpawner(MapGenerator.ROOM2_X * map.getTileSize(), MapGenerator.ROOM2_Y * map.getTileSize(),
+                        MapGenerator.ROOM_SIZE * map.getTileSize(), MapGenerator.ROOM_SIZE * map.getTileSize(), 1),
+
+                new EnemySpawner(MapGenerator.ROOM3_X * map.getTileSize(), MapGenerator.ROOM3_Y * map.getTileSize(),
+                        MapGenerator.ROOM_SIZE * map.getTileSize(), MapGenerator.ROOM_SIZE * map.getTileSize(), 1),
+
+                new EnemySpawner(MapGenerator.ROOM4_X * map.getTileSize(), MapGenerator.ROOM4_Y * map.getTileSize(),
+                        MapGenerator.ROOM_SIZE * map.getTileSize(), MapGenerator.ROOM_SIZE * map.getTileSize(), 1)
+        );
 
         PlayerCombatHandler combatHandler = new PlayerCombatHandler();
 
@@ -61,7 +69,7 @@ public class Main extends Application {
 
         InputController inputController = new InputController();
 
-        GameController controller = new GameController(map, player, view, entities, inputController, gameStateRepository, enemySpawner, combatHandler);
+        GameController controller = new GameController(map, player, view, entities, inputController, gameStateRepository, enemySpawners, combatHandler);
 
         Scene scene = new Scene(view.getRoot(), VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
 
