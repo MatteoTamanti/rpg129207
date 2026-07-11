@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<gameState>
+    <entities>
+        <entity type="Player">
+            <x>462.0</x>
+            <y>454.0</y>
+        </entity>
+    </entities>
+</gameState>

@@ -2,47 +2,37 @@ package it.unicam.cs.mpgc.rpg129207.view;
 
 import it.unicam.cs.mpgc.rpg129207.model.Map;
 import it.unicam.cs.mpgc.rpg129207.model.TileType;
-import javafx.scene.layout.Pane;
+import javafx.scene.Node;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 
 public class MapView {
 
-    private final Map map;
-    private final Pane root;
+    private final Canvas canvas;
 
     public MapView(Map map) {
-        this.map = map;
-        this.root = new Pane();
+        this.canvas = new Canvas(map.getWidth() * map.getTileSize(), map.getHeight() * map.getTileSize());
 
-        drawMap();
+        drawMap(map);
     }
 
-    private void drawMap() {
+    private void drawMap(Map map) {
+        GraphicsContext gc = canvas.getGraphicsContext2D();
 
         for (int y = 0; y < map.getHeight(); y++) {
             for (int x = 0; x < map.getWidth(); x++) {
 
-                Rectangle tile = new Rectangle(
-                        map.getTileSize(),
-                        map.getTileSize()
-                );
+                gc.setFill(map.getTile(y, x) == TileType.WALL
+                        ? Color.DARKGRAY
+                        : Color.LIGHTGRAY);
 
-                tile.setX(x * map.getTileSize());
-                tile.setY(y * map.getTileSize());
-
-                if (map.getTile(y, x) == TileType.WALL) {
-                    tile.setFill(Color.DARKGRAY);
-                } else {
-                    tile.setFill(Color.LIGHTGRAY);
-                }
-                root.getChildren().add(tile);
+                gc.fillRect(x * map.getTileSize(), y * map.getTileSize(), map.getTileSize(), map.getTileSize());
             }
         }
     }
 
-
-    public Pane getRoot() {
-        return root;
+    public Node getRoot() {
+        return canvas;
     }
 }

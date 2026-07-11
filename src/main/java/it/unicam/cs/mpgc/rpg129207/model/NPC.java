@@ -11,6 +11,5 @@ public class NPC extends Entity implements Serializable {
 
     @Override
     public void update(Map map, Player player) {
-
     }
 }

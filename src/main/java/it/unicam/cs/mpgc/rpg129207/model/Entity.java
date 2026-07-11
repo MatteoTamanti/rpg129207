@@ -11,27 +11,25 @@ public abstract class Entity implements Serializable {
         this.y = y;
     }
 
+    protected double size = 32;
 
     public void move(double dx, double dy, Map map) {
-
-        double newX = x + dx;
-        double newY = y + dy;
-
-        if (canMove(newX, newY, map)) {
-            x = newX;
-            y = newY;
+        if (canMove(x + dx, y, map)) {
+            x += dx;
+        }
+        if (canMove(x, y + dy, map)) {
+            y += dy;
         }
     }
-
 
     private boolean canMove(double newX, double newY, Map map) {
 
         int tileSize = map.getTileSize();
 
         int left = (int) (newX / tileSize);
-        int right = (int) ((newX + tileSize - 1) / tileSize);
+        int right = (int) ((newX + size - 1) / tileSize);
         int top = (int) (newY / tileSize);
-        int bottom = (int) ((newY + tileSize - 1) / tileSize);
+        int bottom = (int) ((newY + size - 1) / tileSize);
 
 
         if (left < 0 || right >= map.getWidth()
@@ -39,11 +37,20 @@ public abstract class Entity implements Serializable {
             return false;
         }
 
-        return map.getTile(top, left) == TileType.FLOOR
-                && map.getTile(top, right) == TileType.FLOOR
-                && map.getTile(bottom, left) == TileType.FLOOR
-                && map.getTile(bottom, right) == TileType.FLOOR;
+
+        for (int y = top; y <= bottom; y++) {
+            for (int x = left; x <= right; x++) {
+
+                if (map.getTile(y, x) == TileType.WALL) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
+
+
+
 
     public abstract void update(Map map, Player player);
 

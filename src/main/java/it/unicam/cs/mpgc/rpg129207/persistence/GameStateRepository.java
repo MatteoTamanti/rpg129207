@@ -1,9 +1,6 @@
 package it.unicam.cs.mpgc.rpg129207.persistence;
 
-import it.unicam.cs.mpgc.rpg129207.model.Entity;
-import it.unicam.cs.mpgc.rpg129207.model.Enemy;
-import it.unicam.cs.mpgc.rpg129207.model.Map;
-import it.unicam.cs.mpgc.rpg129207.model.Player;
+import it.unicam.cs.mpgc.rpg129207.model.*;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -89,7 +86,7 @@ public class GameStateRepository {
                 }
             }
 
-            Map map = new Map(20, 20);
+            Map map = new MapGenerator().generateMap();
             return new GameState(map, entities);
 
         } catch (Exception e) {

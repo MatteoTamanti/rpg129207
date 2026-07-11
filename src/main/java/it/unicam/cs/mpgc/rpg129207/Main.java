@@ -18,6 +18,9 @@ import java.util.List;
 
 public class Main extends Application {
 
+    private static final double VIEWPORT_WIDTH = 800;
+    private static final double VIEWPORT_HEIGHT = 600;
+
     @Override
     public void start(Stage primaryStage) {
         Map map;
@@ -34,22 +37,24 @@ public class Main extends Application {
             System.out.println("Game loaded");
 
         } else {
-
             MapGenerator generator = new MapGenerator();
             map = generator.generateMap();
-            player = new Player(100, 10, 70, 70);
+
+            double[] spawn = generator.findCenterSpawn(map);
+            player = new Player(100, 10, spawn[0], spawn[1]);
+
             entities = new ArrayList<>();
             entities.add(player);
             System.out.println("No save data found. New game.");
         }
 
-        GameView view = new GameView(map, entities);
+        GameView view = new GameView(map, entities, player, VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
 
         InputController inputController = new InputController();
 
         GameController controller = new GameController(map, player, view, entities, inputController, gameStateRepository);
 
-        Scene scene = new Scene(view.getRoot(), 800, 600);
+        Scene scene = new Scene(view.getRoot(), VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
 
         inputController.connectKeyboard(scene);
 
@@ -59,7 +64,6 @@ public class Main extends Application {
 
         controller.startLoop();
     }
-
 
     public static void main(String[] args) {
         launch(args);
