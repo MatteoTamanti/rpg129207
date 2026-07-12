@@ -1,14 +1,17 @@
 package it.unicam.cs.mpgc.rpg129207.view;
 
-import it.unicam.cs.mpgc.rpg129207.model.Enemy;
 import it.unicam.cs.mpgc.rpg129207.model.Entity;
 import it.unicam.cs.mpgc.rpg129207.model.Map;
+import it.unicam.cs.mpgc.rpg129207.model.NPC;
 import it.unicam.cs.mpgc.rpg129207.model.Player;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.animation.PauseTransition;
+import javafx.scene.control.Label;
+import javafx.util.Duration;
 
 import java.util.HashMap;
 import java.util.List;
@@ -63,7 +66,7 @@ public class GameView {
             entityShapes.put(entity, createViewFor(entity));
         }
 
-        this.healthBarRenderer = new EntityHealthBarRenderer(entityLayer, e -> e != player);
+        this.healthBarRenderer = new EntityHealthBarRenderer(entityLayer, e -> e != player && !(e instanceof NPC));
         this.playerHud = new PlayerHudView(root);
         this.endGameOverlay = new EndGameOverlay(root, viewportWidth, viewportHeight);
     }
@@ -117,6 +120,18 @@ public class GameView {
 
     public void showVictory() {
         endGameOverlay.show("VICTORY", Color.GOLD);
+    }
+
+    public void showMessage(String text) {
+        Label messageLabel = new Label(text);
+        messageLabel.setStyle("-fx-background-color: rgba(0,0,0,0.7); -fx-text-fill: white; -fx-padding: 10; -fx-font-size: 16;");
+        messageLabel.setLayoutX(20);
+        messageLabel.setLayoutY(root.getHeight() - 60);
+        root.getChildren().add(messageLabel);
+
+        PauseTransition pause = new PauseTransition(Duration.seconds(3));
+        pause.setOnFinished(e -> root.getChildren().remove(messageLabel));
+        pause.play();
     }
 
     public Pane getRoot() {

@@ -21,9 +21,10 @@ public class GameController {
     private List<EnemySpawner> enemySpawners;
     private PlayerCombatHandler combatHandler;
     private GameStatus status = GameStatus.PLAYING;
+    private NPCInteractionHandler npcInteractionHandler;
 
     public GameController(Map map, Player player,  GameView view, List<Entity> entities, InputController inputController,
-                          GameStateRepository gameStateRepository, List<EnemySpawner> enemySpawners, PlayerCombatHandler combatHandler) {
+                          GameStateRepository gameStateRepository, List<EnemySpawner> enemySpawners, PlayerCombatHandler combatHandler, NPCInteractionHandler npcInteractionHandler) {
         this.map = map;
         this.player = player;
         this.entities = entities;
@@ -33,6 +34,7 @@ public class GameController {
         this.gameStateRepository = gameStateRepository;
         this.enemySpawners = enemySpawners;
         this.combatHandler = combatHandler;
+        this.npcInteractionHandler = npcInteractionHandler;
     }
 
     private void saveGame() {
@@ -54,6 +56,8 @@ public class GameController {
             }
 
             combatHandler.update(player, entities, inputController);
+
+            npcInteractionHandler.update(player, entities, inputController, view);
 
             for (Entity e : entities) {
                 e.update(map, player);

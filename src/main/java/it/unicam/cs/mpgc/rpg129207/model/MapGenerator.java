@@ -29,19 +29,10 @@ public class MapGenerator {
         return map;
     }
 
-    public double[] findCenterSpawn(Map map) {
-        int centerX = map.getWidth() / 2;
-        int centerY = map.getHeight() / 2;
-
-        for (int radius = 0; radius < map.getWidth(); radius++) {
-            for (int y = centerY - radius; y <= centerY + radius; y++) {
-                for (int x = centerX - radius; x <= centerX + radius; x++) {
-                    if (isInsideMap(map, x, y) && map.getTile(y, x) == TileType.FLOOR) {
-                        return new double[] { x * map.getTileSize(), y * map.getTileSize() };
-                    }
-                }
-            }
-        } throw new IllegalStateException("No floor tile found near map center");
+    public double[] findRoom1Spawn(Map map) {
+        int centerX = ROOM1_X + ROOM_SIZE / 2;
+        int centerY = ROOM1_Y + ROOM_SIZE / 2;
+        return new double[] { centerX * map.getTileSize(), centerY * map.getTileSize() };
     }
 
     private boolean isInsideMap(Map map, int x, int y) {

@@ -1,14 +1,7 @@
 package it.unicam.cs.mpgc.rpg129207;
 
-import it.unicam.cs.mpgc.rpg129207.controller.EnemySpawner;
-import it.unicam.cs.mpgc.rpg129207.controller.GameController;
-import it.unicam.cs.mpgc.rpg129207.controller.InputController;
-import it.unicam.cs.mpgc.rpg129207.controller.PlayerCombatHandler;
-import it.unicam.cs.mpgc.rpg129207.model.Entity;
-import it.unicam.cs.mpgc.rpg129207.model.Enemy;
-import it.unicam.cs.mpgc.rpg129207.model.Map;
-import it.unicam.cs.mpgc.rpg129207.model.MapGenerator;
-import it.unicam.cs.mpgc.rpg129207.model.Player;
+import it.unicam.cs.mpgc.rpg129207.controller.*;
+import it.unicam.cs.mpgc.rpg129207.model.*;
 import it.unicam.cs.mpgc.rpg129207.persistence.GameState;
 import it.unicam.cs.mpgc.rpg129207.persistence.GameStateRepository;
 import it.unicam.cs.mpgc.rpg129207.view.GameView;
@@ -46,12 +39,21 @@ public class Main extends Application {
             MapGenerator generator = new MapGenerator();
             map = generator.generateMap();
 
-            double[] spawn = generator.findCenterSpawn(map);
+            double[] spawn = generator.findRoom1Spawn(map);
 
             player = new Player(100, 10, 0.5, spawn[0], spawn[1]);
 
             entities = new ArrayList<>();
             entities.add(player);
+
+            NPC npc = new NPC(spawn[0] + 60, spawn[1], List.of(
+                    "Greetings noble knight!",
+                    "Our town is plagued by ghouls! Would you be so kind to help us?",
+                    "We would be eternally grateful for your assistance!"
+            ));
+            entities.add(npc);
+            System.out.println("NPC creato a: " + npc.getX() + ", " + npc.getY());
+
             System.out.println("No save data found. New game.");
         }
 
@@ -68,13 +70,23 @@ public class Main extends Application {
 
         PlayerCombatHandler combatHandler = new PlayerCombatHandler();
 
+        NPCInteractionHandler npcInteractionHandler = new NPCInteractionHandler();
+
         Image playerImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/sprites/player.png")));
         Image enemyImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/sprites/enemy.png")));
         Image floorImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/sprites/floor.png")));
         Image wallImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/sprites/wall.png")));
+        Image npcImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/sprites/npc.png")));
 
-        Function<Entity, Image> spriteSelector = entity ->
-                entity instanceof Enemy ? enemyImage : playerImage;
+        Function<Entity, Image> spriteSelector = entity -> {
+            if (entity instanceof Enemy) {
+                return enemyImage;
+            }
+            if (entity instanceof NPC) {
+                return npcImage;
+            }
+            return playerImage;
+        };
 
         GameView view = new GameView(
                 map, entities, player, VIEWPORT_WIDTH, VIEWPORT_HEIGHT,
@@ -83,7 +95,7 @@ public class Main extends Application {
 
         InputController inputController = new InputController();
 
-        GameController controller = new GameController(map, player, view, entities, inputController, gameStateRepository, enemySpawners, combatHandler);
+        GameController controller = new GameController(map, player, view, entities, inputController, gameStateRepository, enemySpawners, combatHandler, npcInteractionHandler);
 
         Scene scene = new Scene(view.getRoot(), VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
 

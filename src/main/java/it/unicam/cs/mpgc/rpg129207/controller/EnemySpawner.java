@@ -17,9 +17,7 @@ public class EnemySpawner {
     private boolean triggered;
     private final List<Enemy> spawnedEnemies;
 
-    public EnemySpawner(double triggerX, double triggerY,
-                        double triggerWidth, double triggerHeight,
-                        int enemyCount) {
+    public EnemySpawner(double triggerX, double triggerY, double triggerWidth, double triggerHeight, int enemyCount) {
         this.triggerX = triggerX;
         this.triggerY = triggerY;
         this.triggerWidth = triggerWidth;
