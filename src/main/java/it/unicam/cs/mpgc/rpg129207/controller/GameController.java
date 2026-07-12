@@ -20,6 +20,7 @@ public class GameController {
     private GameStateRepository gameStateRepository;
     private List<EnemySpawner> enemySpawners;
     private PlayerCombatHandler combatHandler;
+    private GameStatus status = GameStatus.PLAYING;
 
     public GameController(Map map, Player player,  GameView view, List<Entity> entities, InputController inputController,
                           GameStateRepository gameStateRepository, List<EnemySpawner> enemySpawners, PlayerCombatHandler combatHandler) {
@@ -40,30 +41,47 @@ public class GameController {
     }
 
     private void updateGame() {
-        double speed = 2.0;
+        if (status == GameStatus.PLAYING) {
+            double speed = 2.0;
 
-        if (inputController.isKeyPressed(KeyCode.W)) player.move(0, -speed, map);
-        if (inputController.isKeyPressed(KeyCode.S)) player.move(0, speed, map);
-        if (inputController.isKeyPressed(KeyCode.A)) player.move(-speed, 0, map);
-        if (inputController.isKeyPressed(KeyCode.D)) player.move(speed, 0, map);
+            if (inputController.isKeyPressed(KeyCode.W)) player.move(0, -speed, map);
+            if (inputController.isKeyPressed(KeyCode.S)) player.move(0, speed, map);
+            if (inputController.isKeyPressed(KeyCode.A)) player.move(-speed, 0, map);
+            if (inputController.isKeyPressed(KeyCode.D)) player.move(speed, 0, map);
 
-        if (inputController.consumeKey(KeyCode.P)) {
-            saveGame();
-        }
+            if (inputController.consumeKey(KeyCode.P)) {
+                saveGame();
+            }
 
-        combatHandler.update(player, entities, inputController);
+            combatHandler.update(player, entities, inputController);
 
-        for (Entity e : entities) {
-            e.update(map, player);
-        }
+            for (Entity e : entities) {
+                e.update(map, player);
+            }
 
-        removeDeadEnemies();
+            removeDeadEnemies();
 
-        for (EnemySpawner spawner : enemySpawners) {
-            spawner.update(player, entities);
+            for (EnemySpawner spawner : enemySpawners) {
+                spawner.update(player, entities);
+            }
+            checkGameEndConditions();
         }
 
         view.render();
+    }
+
+    private void checkGameEndConditions() {
+        if (!player.isAlive()) {
+            status = GameStatus.GAME_OVER;
+            view.showGameOver();
+            return;
+        }
+
+        EnemySpawner finalDungeon = enemySpawners.get(enemySpawners.size() - 1);
+        if (finalDungeon.isCleared()) {
+            status = GameStatus.VICTORY;
+            view.showVictory();
+        }
     }
 
     private void removeDeadEnemies() {

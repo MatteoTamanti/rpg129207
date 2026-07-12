@@ -3,6 +3,8 @@ package it.unicam.cs.mpgc.rpg129207.controller;
 import it.unicam.cs.mpgc.rpg129207.model.Entity;
 import it.unicam.cs.mpgc.rpg129207.model.Enemy;
 import it.unicam.cs.mpgc.rpg129207.model.Player;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class EnemySpawner {
@@ -13,21 +15,25 @@ public class EnemySpawner {
     private final double triggerHeight;
     private final int enemyCount;
     private boolean triggered;
+    private final List<Enemy> spawnedEnemies;
 
-    public EnemySpawner(double triggerX, double triggerY, double triggerWidth, double triggerHeight, int enemyCount) {
+    public EnemySpawner(double triggerX, double triggerY,
+                        double triggerWidth, double triggerHeight,
+                        int enemyCount) {
         this.triggerX = triggerX;
         this.triggerY = triggerY;
         this.triggerWidth = triggerWidth;
         this.triggerHeight = triggerHeight;
         this.enemyCount = enemyCount;
         this.triggered = false;
+        this.spawnedEnemies = new ArrayList<>();
     }
 
     public void update(Player player, List<Entity> entities) {
-
         if (triggered) {
             return;
         }
+
         if (isPlayerInside(player)) {
             spawnEnemies(entities);
             triggered = true;
@@ -35,12 +41,21 @@ public class EnemySpawner {
     }
 
     private boolean isPlayerInside(Player player) {
-        return player.getX() >= triggerX && player.getX() <= triggerX + triggerWidth && player.getY() >= triggerY && player.getY() <= triggerY + triggerHeight;
+        return player.getX() >= triggerX
+                && player.getX() <= triggerX + triggerWidth
+                && player.getY() >= triggerY
+                && player.getY() <= triggerY + triggerHeight;
     }
 
     private void spawnEnemies(List<Entity> entities) {
         for (int i = 0; i < enemyCount; i++) {
-            entities.add(new Enemy(30, 5,1 ,  triggerX + i * 32, triggerY));
+            Enemy enemy = new Enemy(30, 5, 1.5, triggerX + i * 32, triggerY);
+            entities.add(enemy);
+            spawnedEnemies.add(enemy);
         }
+    }
+
+    public boolean isCleared() {
+        return triggered && spawnedEnemies.stream().noneMatch(Enemy::isAlive);
     }
 }

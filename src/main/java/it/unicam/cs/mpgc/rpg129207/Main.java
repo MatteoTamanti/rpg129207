@@ -5,6 +5,7 @@ import it.unicam.cs.mpgc.rpg129207.controller.GameController;
 import it.unicam.cs.mpgc.rpg129207.controller.InputController;
 import it.unicam.cs.mpgc.rpg129207.controller.PlayerCombatHandler;
 import it.unicam.cs.mpgc.rpg129207.model.Entity;
+import it.unicam.cs.mpgc.rpg129207.model.Enemy;
 import it.unicam.cs.mpgc.rpg129207.model.Map;
 import it.unicam.cs.mpgc.rpg129207.model.MapGenerator;
 import it.unicam.cs.mpgc.rpg129207.model.Player;
@@ -13,10 +14,13 @@ import it.unicam.cs.mpgc.rpg129207.persistence.GameStateRepository;
 import it.unicam.cs.mpgc.rpg129207.view.GameView;
 import javafx.application.Application;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.function.Function;
 
 public class Main extends Application {
 
@@ -28,7 +32,6 @@ public class Main extends Application {
         Map map;
         Player player;
         List<Entity> entities;
-        EnemySpawner enemySpawner;
 
         GameStateRepository gameStateRepository = new GameStateRepository();
         GameState savedData = gameStateRepository.load();
@@ -65,7 +68,18 @@ public class Main extends Application {
 
         PlayerCombatHandler combatHandler = new PlayerCombatHandler();
 
-        GameView view = new GameView(map, entities, player, VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
+        Image playerImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/sprites/player.png")));
+        Image enemyImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/sprites/enemy.png")));
+        Image floorImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/sprites/floor.png")));
+        Image wallImage = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/sprites/wall.png")));
+
+        Function<Entity, Image> spriteSelector = entity ->
+                entity instanceof Enemy ? enemyImage : playerImage;
+
+        GameView view = new GameView(
+                map, entities, player, VIEWPORT_WIDTH, VIEWPORT_HEIGHT,
+                spriteSelector, floorImage, wallImage
+        );
 
         InputController inputController = new InputController();
 

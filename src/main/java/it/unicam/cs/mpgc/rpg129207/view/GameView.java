@@ -1,14 +1,18 @@
 package it.unicam.cs.mpgc.rpg129207.view;
 
+import it.unicam.cs.mpgc.rpg129207.model.Enemy;
 import it.unicam.cs.mpgc.rpg129207.model.Entity;
 import it.unicam.cs.mpgc.rpg129207.model.Map;
 import it.unicam.cs.mpgc.rpg129207.model.Player;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.function.Function;
 
 public class GameView {
 
@@ -18,23 +22,34 @@ public class GameView {
     private final Player player;
     private final Pane entityLayer;
     private final List<Entity> entities;
-    private final java.util.Map<Entity, Rectangle> entityShapes;
+    private final java.util.Map<Entity, ImageView> entityShapes;
+    private final Function<Entity, Image> spriteSelector;
     private final MapView mapView;
     private final int tileSize;
     private final EntityHealthBarRenderer healthBarRenderer;
     private final PlayerHudView playerHud;
+    private final EndGameOverlay endGameOverlay;
 
-    public GameView(Map map, List<Entity> entities, Player player, double viewportWidth, double viewportHeight) {
+    public GameView(Map map, List<Entity> entities, Player player,
+                    double viewportWidth, double viewportHeight,
+                    Function<Entity, Image> spriteSelector,
+                    Image floorImage, Image wallImage) {
 
         this.entities = entities;
         this.player = player;
+        this.tileSize = map.getTileSize();
+        this.spriteSelector = spriteSelector;
         this.root = new Pane();
         this.world = new Pane();
         this.entityLayer = new Pane();
         this.entityShapes = new HashMap<>();
-        this.mapView = new MapView(map);
-        this.tileSize = map.getTileSize();
-        this.camera = new Camera(viewportWidth, viewportHeight, map.getWidth() * map.getTileSize(), map.getHeight() * map.getTileSize());
+        this.mapView = new MapView(map, floorImage, wallImage);
+
+        this.camera = new Camera(
+                viewportWidth, viewportHeight,
+                map.getWidth() * map.getTileSize(),
+                map.getHeight() * map.getTileSize()
+        );
 
         world.getChildren().add(mapView.getRoot());
         world.getChildren().add(entityLayer);
@@ -42,23 +57,26 @@ public class GameView {
 
         root.setPrefSize(viewportWidth, viewportHeight);
         root.setClip(new Rectangle(viewportWidth, viewportHeight));
+        root.setStyle("-fx-background-color: black;");
 
         for (Entity entity : entities) {
-            Rectangle shape = new Rectangle(map.getTileSize(), map.getTileSize());
-
-            shape.setFill(Color.BLUEVIOLET);
-            entityShapes.put(entity, shape);
-            entityLayer.getChildren().add(shape);
+            entityShapes.put(entity, createViewFor(entity));
         }
+
         this.healthBarRenderer = new EntityHealthBarRenderer(entityLayer, e -> e != player);
         this.playerHud = new PlayerHudView(root);
+        this.endGameOverlay = new EndGameOverlay(root, viewportWidth, viewportHeight);
     }
 
     public void render() {
         for (Entity entity : entities) {
-            Rectangle shape = entityShapes.computeIfAbsent(entity, e -> createShapeFor());
-            shape.setX(entity.getX());
-            shape.setY(entity.getY());
+            ImageView view = entityShapes.computeIfAbsent(entity, this::createViewFor);
+
+            double displaySize = spriteSizeFor(entity);
+            double offset = (displaySize - tileSize) / 2;
+
+            view.setX(entity.getX() - offset);
+            view.setY(entity.getY() - offset);
         }
 
         healthBarRenderer.update(entities);
@@ -69,21 +87,36 @@ public class GameView {
         world.setTranslateY(-Math.round(camera.getY()));
     }
 
+    private ImageView createViewFor(Entity entity) {
+        double displaySize = spriteSizeFor(entity);
+
+        ImageView view = new ImageView(spriteSelector.apply(entity));
+        view.setFitWidth(displaySize);
+        view.setFitHeight(displaySize);
+        entityLayer.getChildren().add(view);
+        return view;
+    }
+
+    private double spriteSizeFor(Entity entity) {
+        return entity instanceof Player ? tileSize * 1.75 : tileSize;
+    }
+
     public boolean removeEntity(Entity entity) {
-        Rectangle shape = entityShapes.remove(entity);
-        if (shape != null) {
-            entityLayer.getChildren().remove(shape);
+        ImageView view = entityShapes.remove(entity);
+        if (view != null) {
+            entityLayer.getChildren().remove(view);
         }
 
         healthBarRenderer.remove(entity);
         return true;
     }
 
-    private Rectangle createShapeFor() {
-        Rectangle shape = new Rectangle(tileSize, tileSize);
-        shape.setFill(Color.BLUEVIOLET);
-        entityLayer.getChildren().add(shape);
-        return shape;
+    public void showGameOver() {
+        endGameOverlay.show("GAME OVER", Color.RED);
+    }
+
+    public void showVictory() {
+        endGameOverlay.show("VICTORY", Color.GOLD);
     }
 
     public Pane getRoot() {
