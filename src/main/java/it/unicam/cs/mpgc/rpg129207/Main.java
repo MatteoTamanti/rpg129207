@@ -100,7 +100,7 @@ public class Main extends Application {
 
         inputController.connectKeyboard(scene);
 
-        primaryStage.setTitle("RPG Project");
+        primaryStage.setTitle("BERK");
         primaryStage.setScene(scene);
         primaryStage.show();
 
