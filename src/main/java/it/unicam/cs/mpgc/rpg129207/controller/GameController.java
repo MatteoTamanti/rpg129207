@@ -11,25 +11,30 @@ import java.util.List;
 import javafx.scene.input.KeyCode;
 
 public class GameController {
-    private Map map;
-    private Player player;
-    private List<Entity> entities;
-    private GameView view;
-    private InputController inputController;
-    private GameLoop gameLoop;
-    private GameStateRepository gameStateRepository;
-    private List<EnemySpawner> enemySpawners;
-    private PlayerCombatHandler combatHandler;
-    private GameStatus status = GameStatus.PLAYING;
-    private NPCInteractionHandler npcInteractionHandler;
 
-    public GameController(Map map, Player player,  GameView view, List<Entity> entities, InputController inputController,
-                          GameStateRepository gameStateRepository, List<EnemySpawner> enemySpawners, PlayerCombatHandler combatHandler, NPCInteractionHandler npcInteractionHandler) {
+    private static final double PLAYER_SPEED = 2.0;
+
+    private final Map map;
+    private final Player player;
+    private final List<Entity> entities;
+    private final GameView view;
+    private final InputController inputController;
+    private final GameLoop gameLoop;
+    private final GameStateRepository gameStateRepository;
+    private final List<EnemySpawner> enemySpawners;
+    private final PlayerCombatHandler combatHandler;
+    private final NPCInteractionHandler npcInteractionHandler;
+
+    private GameStatus status = GameStatus.PLAYING;
+
+    public GameController(Map map, Player player, GameView view, List<Entity> entities, InputController inputController,
+                          GameStateRepository gameStateRepository, List<EnemySpawner> enemySpawners,
+                          PlayerCombatHandler combatHandler, NPCInteractionHandler npcInteractionHandler) {
         this.map = map;
         this.player = player;
         this.entities = entities;
         this.view = view;
-        this.inputController  = inputController;
+        this.inputController = inputController;
         this.gameLoop = new GameLoop(this::updateGame);
         this.gameStateRepository = gameStateRepository;
         this.enemySpawners = enemySpawners;
@@ -37,41 +42,56 @@ public class GameController {
         this.npcInteractionHandler = npcInteractionHandler;
     }
 
+    private void updateGame() {
+        if (status == GameStatus.PLAYING) {
+            handlePlayerMovement();
+            handleSaveRequest();
+
+            combatHandler.update(player, entities, inputController);
+            npcInteractionHandler.update(player, entities, inputController, view);
+
+            updateEntities();
+            removeDeadEnemies();
+            updateEnemySpawners();
+
+            checkGameEndConditions();
+        }
+
+        view.render();
+    }
+
+    private void handlePlayerMovement() {
+        if (inputController.isKeyPressed(KeyCode.W)) player.move(0, -PLAYER_SPEED, map);
+        if (inputController.isKeyPressed(KeyCode.S)) player.move(0, PLAYER_SPEED, map);
+        if (inputController.isKeyPressed(KeyCode.A)) player.move(-PLAYER_SPEED, 0, map);
+        if (inputController.isKeyPressed(KeyCode.D)) player.move(PLAYER_SPEED, 0, map);
+    }
+
+    private void handleSaveRequest() {
+        if (inputController.consumeKey(KeyCode.P)) {
+            saveGame();
+        }
+    }
+
     private void saveGame() {
         GameState state = new GameState(map, entities);
         gameStateRepository.save(state);
     }
 
-    private void updateGame() {
-        if (status == GameStatus.PLAYING) {
-            double speed = 2.0;
-
-            if (inputController.isKeyPressed(KeyCode.W)) player.move(0, -speed, map);
-            if (inputController.isKeyPressed(KeyCode.S)) player.move(0, speed, map);
-            if (inputController.isKeyPressed(KeyCode.A)) player.move(-speed, 0, map);
-            if (inputController.isKeyPressed(KeyCode.D)) player.move(speed, 0, map);
-
-            if (inputController.consumeKey(KeyCode.P)) {
-                saveGame();
-            }
-
-            combatHandler.update(player, entities, inputController);
-
-            npcInteractionHandler.update(player, entities, inputController, view);
-
-            for (Entity e : entities) {
-                e.update(map, player);
-            }
-
-            removeDeadEnemies();
-
-            for (EnemySpawner spawner : enemySpawners) {
-                spawner.update(player, entities);
-            }
-            checkGameEndConditions();
+    private void updateEntities() {
+        for (Entity e : entities) {
+            e.update(map, player);
         }
+    }
 
-        view.render();
+    private void updateEnemySpawners() {
+        for (EnemySpawner spawner : enemySpawners) {
+            spawner.update(player, entities);
+        }
+    }
+
+    private void removeDeadEnemies() {
+        entities.removeIf(e -> e instanceof Enemy enemy && !enemy.isAlive() && view.removeEntity(enemy));
     }
 
     private void checkGameEndConditions() {
@@ -86,10 +106,6 @@ public class GameController {
             status = GameStatus.VICTORY;
             view.showVictory();
         }
-    }
-
-    private void removeDeadEnemies() {
-        entities.removeIf(e -> e instanceof Enemy enemy && !enemy.isAlive() && view.removeEntity(enemy));
     }
 
     public void startLoop() {

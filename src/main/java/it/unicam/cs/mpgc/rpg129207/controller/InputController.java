@@ -4,9 +4,11 @@ import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 
 import java.util.HashSet;
+import java.util.Set;
 
 public class InputController {
-    private HashSet<KeyCode> pressedKeys;
+
+    private final Set<KeyCode> pressedKeys;
 
     public InputController() {
         this.pressedKeys = new HashSet<>();
@@ -16,16 +18,16 @@ public class InputController {
         if (pressedKeys.contains(key)) {
             pressedKeys.remove(key);
             return true;
-        } return false;
+        }
+        return false;
     }
 
     public void connectKeyboard(Scene scene) {
-        scene.setOnKeyPressed(event ->  pressedKeys.add(event.getCode()));
+        scene.setOnKeyPressed(event -> pressedKeys.add(event.getCode()));
         scene.setOnKeyReleased(event -> pressedKeys.remove(event.getCode()));
     }
 
     public boolean isKeyPressed(KeyCode key) {
         return pressedKeys.contains(key);
     }
-
 }

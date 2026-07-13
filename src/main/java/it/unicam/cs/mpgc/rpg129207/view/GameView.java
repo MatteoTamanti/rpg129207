@@ -4,13 +4,13 @@ import it.unicam.cs.mpgc.rpg129207.model.Entity;
 import it.unicam.cs.mpgc.rpg129207.model.Map;
 import it.unicam.cs.mpgc.rpg129207.model.NPC;
 import it.unicam.cs.mpgc.rpg129207.model.Player;
+import javafx.animation.PauseTransition;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-import javafx.animation.PauseTransition;
-import javafx.scene.control.Label;
 import javafx.util.Duration;
 
 import java.util.HashMap;
@@ -18,6 +18,12 @@ import java.util.List;
 import java.util.function.Function;
 
 public class GameView {
+
+    private static final double PLAYER_SPRITE_SCALE = 1.75;
+    private static final String BACKGROUND_STYLE = "-fx-background-color: black;";
+    private static final double MESSAGE_MARGIN_X = 20;
+    private static final double MESSAGE_MARGIN_BOTTOM = 60;
+    private static final double MESSAGE_DURATION_SECONDS = 3;
 
     private final Pane root;
     private final Pane world;
@@ -47,28 +53,38 @@ public class GameView {
         this.entityLayer = new Pane();
         this.entityShapes = new HashMap<>();
         this.mapView = new MapView(map, floorImage, wallImage);
+        this.camera = createCamera(map, viewportWidth, viewportHeight);
 
-        this.camera = new Camera(
-                viewportWidth, viewportHeight,
-                map.getWidth() * map.getTileSize(),
-                map.getHeight() * map.getTileSize()
-        );
-
-        world.getChildren().add(mapView.getRoot());
-        world.getChildren().add(entityLayer);
-        root.getChildren().add(world);
-
-        root.setPrefSize(viewportWidth, viewportHeight);
-        root.setClip(new Rectangle(viewportWidth, viewportHeight));
-        root.setStyle("-fx-background-color: black;");
-
-        for (Entity entity : entities) {
-            entityShapes.put(entity, createViewFor(entity));
-        }
+        assembleSceneGraph();
+        configureRoot(viewportWidth, viewportHeight);
+        createInitialEntityViews();
 
         this.healthBarRenderer = new EntityHealthBarRenderer(entityLayer, e -> e != player && !(e instanceof NPC));
         this.playerHud = new PlayerHudView(root);
         this.endGameOverlay = new EndGameOverlay(root, viewportWidth, viewportHeight);
+    }
+
+    private Camera createCamera(Map map, double viewportWidth, double viewportHeight) {
+        return new Camera(viewportWidth, viewportHeight,
+                map.getWidth() * map.getTileSize(), map.getHeight() * map.getTileSize());
+    }
+
+    private void assembleSceneGraph() {
+        world.getChildren().add(mapView.getRoot());
+        world.getChildren().add(entityLayer);
+        root.getChildren().add(world);
+    }
+
+    private void configureRoot(double viewportWidth, double viewportHeight) {
+        root.setPrefSize(viewportWidth, viewportHeight);
+        root.setClip(new Rectangle(viewportWidth, viewportHeight));
+        root.setStyle(BACKGROUND_STYLE);
+    }
+
+    private void createInitialEntityViews() {
+        for (Entity entity : entities) {
+            entityShapes.put(entity, createViewFor(entity));
+        }
     }
 
     public void render() {
@@ -101,7 +117,7 @@ public class GameView {
     }
 
     private double spriteSizeFor(Entity entity) {
-        return entity instanceof Player ? tileSize * 1.75 : tileSize;
+        return entity instanceof Player ? tileSize * PLAYER_SPRITE_SCALE : tileSize;
     }
 
     public boolean removeEntity(Entity entity) {
@@ -125,11 +141,11 @@ public class GameView {
     public void showMessage(String text) {
         Label messageLabel = new Label(text);
         messageLabel.setStyle("-fx-background-color: rgba(0,0,0,0.7); -fx-text-fill: white; -fx-padding: 10; -fx-font-size: 16;");
-        messageLabel.setLayoutX(20);
-        messageLabel.setLayoutY(root.getHeight() - 60);
+        messageLabel.setLayoutX(MESSAGE_MARGIN_X);
+        messageLabel.setLayoutY(root.getHeight() - MESSAGE_MARGIN_BOTTOM);
         root.getChildren().add(messageLabel);
 
-        PauseTransition pause = new PauseTransition(Duration.seconds(3));
+        PauseTransition pause = new PauseTransition(Duration.seconds(MESSAGE_DURATION_SECONDS));
         pause.setOnFinished(e -> root.getChildren().remove(messageLabel));
         pause.play();
     }

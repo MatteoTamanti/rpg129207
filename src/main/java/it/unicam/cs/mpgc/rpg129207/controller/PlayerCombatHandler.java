@@ -3,6 +3,7 @@ package it.unicam.cs.mpgc.rpg129207.controller;
 import it.unicam.cs.mpgc.rpg129207.model.Entity;
 import it.unicam.cs.mpgc.rpg129207.model.Enemy;
 import it.unicam.cs.mpgc.rpg129207.model.Player;
+import javafx.scene.input.KeyCode;
 
 import java.util.List;
 
@@ -11,7 +12,7 @@ public class PlayerCombatHandler {
     private static final double ATTACK_RANGE = 30;
 
     public void update(Player player, List<Entity> entities, InputController inputController) {
-        if (!inputController.consumeKey(javafx.scene.input.KeyCode.SPACE)) {
+        if (!inputController.consumeKey(KeyCode.SPACE)) {
             return;
         }
 
@@ -33,9 +34,7 @@ public class PlayerCombatHandler {
 
         for (Entity e : entities) {
             if (e instanceof Enemy enemy && enemy.isAlive()) {
-                double dx = enemy.getX() - player.getX();
-                double dy = enemy.getY() - player.getY();
-                double distance = Math.sqrt(dx * dx + dy * dy);
+                double distance = player.distanceTo(enemy);
 
                 if (distance < nearestDistance) {
                     nearestDistance = distance;

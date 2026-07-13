@@ -3,7 +3,6 @@ package it.unicam.cs.mpgc.rpg129207.view;
 import it.unicam.cs.mpgc.rpg129207.model.Entity;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

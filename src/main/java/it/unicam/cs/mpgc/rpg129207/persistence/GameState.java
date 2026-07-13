@@ -9,8 +9,8 @@ import java.util.List;
 public class GameState implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private Map map;
-    private List<Entity> entities;
+    private final Map map;
+    private final List<Entity> entities;
 
     public GameState(Map map, List<Entity> entities) {
         this.map = map;
@@ -27,9 +27,10 @@ public class GameState implements Serializable {
 
     public Player getPlayer() {
         for (Entity entity : entities) {
-            if (entity instanceof Player) {
-                return (Player) entity;
+            if (entity instanceof Player player) {
+                return player;
             }
-        } throw new IllegalStateException("No player found in saved game");
+        }
+        throw new IllegalStateException("No player found in saved game");
     }
 }

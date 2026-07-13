@@ -12,19 +12,24 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 public class GameStateRepository {
-    private final File file = new File("savedState.xml");
+
+    private static final String SAVE_FILE_NAME = "savedState.xml";
+    private static final String PLAYER_TYPE = "Player";
+    private static final String ENEMY_TYPE = "Enemy";
+    private static final String NPC_TYPE = "NPC";
+
+    private final File file = new File(SAVE_FILE_NAME);
 
     public void save(GameState gameState) {
         try {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            Document document = builder.newDocument();
+            Document document = createDocument();
 
             Element root = document.createElement("gameState");
             document.appendChild(root);
@@ -33,59 +38,69 @@ public class GameStateRepository {
             root.appendChild(entitiesElement);
 
             for (Entity entity : gameState.getEntities()) {
-                Element entityElement = document.createElement("entity");
-                entityElement.setAttribute("type", entity.getClass().getSimpleName());
-
-                Element x = document.createElement("x");
-                x.appendChild(document.createTextNode(String.valueOf(entity.getX())));
-
-                Element y = document.createElement("y");
-                y.appendChild(document.createTextNode(String.valueOf(entity.getY())));
-
-                entityElement.appendChild(x);
-                entityElement.appendChild(y);
-                entitiesElement.appendChild(entityElement);
+                entitiesElement.appendChild(createEntityElement(document, entity));
             }
 
-            TransformerFactory transformerFactory = TransformerFactory.newInstance();
-            Transformer transformer = transformerFactory.newTransformer();
-            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-            transformer.transform(new DOMSource(document), new StreamResult(file));
-
+            writeToFile(document);
             System.out.println("Game saved");
+
         } catch (Exception e) {
             System.err.println("Error saving game " + e.getMessage());
         }
     }
 
+    private Document createDocument() throws Exception {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        return builder.newDocument();
+    }
+
+    private Element createEntityElement(Document document, Entity entity) {
+        Element entityElement = document.createElement("entity");
+        entityElement.setAttribute("type", entity.getClass().getSimpleName());
+
+        entityElement.appendChild(createTextElement(document, "x", String.valueOf(entity.getX())));
+        entityElement.appendChild(createTextElement(document, "y", String.valueOf(entity.getY())));
+
+        if (entity instanceof NPC npc) {
+            entityElement.appendChild(createNpcDialogueElement(document, npc));
+        }
+
+        return entityElement;
+    }
+
+    private Element createNpcDialogueElement(Document document, NPC npc) {
+        Element dialogueElement = document.createElement("dialogue");
+        dialogueElement.setAttribute("currentLine", String.valueOf(npc.getCurrentLine()));
+
+        for (String line : npc.getDialogueLines()) {
+            dialogueElement.appendChild(createTextElement(document, "line", line));
+        }
+
+        return dialogueElement;
+    }
+
+    private Element createTextElement(Document document, String tagName, String value) {
+        Element element = document.createElement(tagName);
+        element.appendChild(document.createTextNode(value));
+        return element;
+    }
+
+    private void writeToFile(Document document) throws Exception {
+        TransformerFactory transformerFactory = TransformerFactory.newInstance();
+        Transformer transformer = transformerFactory.newTransformer();
+        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+        transformer.transform(new DOMSource(document), new StreamResult(file));
+    }
+
     public GameState load() {
-        if (!file.exists()) return null;
+        if (!file.exists()) {
+            return null;
+        }
 
         try {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            Document document = builder.parse(file);
-            document.getDocumentElement().normalize();
-
-            List<Entity> entities = new ArrayList<>();
-            var nodes = document.getElementsByTagName("entity");
-
-            for (int i = 0; i < nodes.getLength(); i++) {
-                Element element = (Element) nodes.item(i);
-                String type = element.getAttribute("type");
-
-                double x = Double.parseDouble(element.getElementsByTagName("x").item(0).getTextContent());
-                double y = Double.parseDouble(element.getElementsByTagName("y").item(0).getTextContent());
-
-                if (type.equals("Player")) {
-                    entities.add(new Player(100, 10, 0.5, x, y));
-                } else if (type.equals("Enemy")) {
-                    entities.add(new Enemy(30, 5, 1, x, y));
-                } else {
-                    System.err.println("Unknown entity type: " + type);
-                }
-            }
-
+            Document document = parseDocument();
+            List<Entity> entities = readEntities(document);
             Map map = new MapGenerator().generateMap();
             return new GameState(map, entities);
 
@@ -93,5 +108,58 @@ public class GameStateRepository {
             System.err.println("Error loading game " + e.getMessage());
             return null;
         }
+    }
+
+    private Document parseDocument() throws Exception {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Document document = builder.parse(file);
+        document.getDocumentElement().normalize();
+        return document;
+    }
+
+    private List<Entity> readEntities(Document document) {
+        List<Entity> entities = new ArrayList<>();
+        NodeList nodes = document.getElementsByTagName("entity");
+
+        for (int i = 0; i < nodes.getLength(); i++) {
+            Element element = (Element) nodes.item(i);
+            entities.add(readEntity(element));
+        }
+
+        return entities;
+    }
+
+    private Entity readEntity(Element element) {
+        String type = element.getAttribute("type");
+        double x = readDoubleChild(element, "x");
+        double y = readDoubleChild(element, "y");
+
+        return switch (type) {
+            case PLAYER_TYPE -> new Player(x, y);
+            case ENEMY_TYPE -> new Enemy(x, y);
+            case NPC_TYPE -> readNpc(element, x, y);
+            default -> {
+                System.err.println("Unknown entity type: " + type);
+                yield null;
+            }
+        };
+    }
+
+    private NPC readNpc(Element entityElement, double x, double y) {
+        Element dialogueElement = (Element) entityElement.getElementsByTagName("dialogue").item(0);
+        int currentLine = Integer.parseInt(dialogueElement.getAttribute("currentLine"));
+
+        NodeList lineNodes = dialogueElement.getElementsByTagName("line");
+        List<String> dialogueLines = new ArrayList<>();
+        for (int i = 0; i < lineNodes.getLength(); i++) {
+            dialogueLines.add(lineNodes.item(i).getTextContent());
+        }
+
+        return new NPC(x, y, dialogueLines, currentLine);
+    }
+
+    private double readDoubleChild(Element parent, String tagName) {
+        return Double.parseDouble(parent.getElementsByTagName(tagName).item(0).getTextContent());
     }
 }

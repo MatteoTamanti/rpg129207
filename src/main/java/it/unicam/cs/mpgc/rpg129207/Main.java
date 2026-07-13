@@ -41,7 +41,7 @@ public class Main extends Application {
 
             double[] spawn = generator.findRoom1Spawn(map);
 
-            player = new Player(100, 10, 0.5, spawn[0], spawn[1]);
+            player = new Player(spawn[0], spawn[1]);
 
             entities = new ArrayList<>();
             entities.add(player);
@@ -52,7 +52,6 @@ public class Main extends Application {
                     "We would be eternally grateful for your assistance!"
             ));
             entities.add(npc);
-            System.out.println("NPC creato a: " + npc.getX() + ", " + npc.getY());
 
             System.out.println("No save data found. New game.");
         }

@@ -9,6 +9,7 @@ import java.util.List;
 
 public class EnemySpawner {
 
+    private static final double ENEMY_SPACING = 32;
     private final double triggerX;
     private final double triggerY;
     private final double triggerWidth;
@@ -39,15 +40,13 @@ public class EnemySpawner {
     }
 
     private boolean isPlayerInside(Player player) {
-        return player.getX() >= triggerX
-                && player.getX() <= triggerX + triggerWidth
-                && player.getY() >= triggerY
-                && player.getY() <= triggerY + triggerHeight;
+        return player.getX() >= triggerX && player.getX() <= triggerX + triggerWidth
+                && player.getY() >= triggerY && player.getY() <= triggerY + triggerHeight;
     }
 
     private void spawnEnemies(List<Entity> entities) {
         for (int i = 0; i < enemyCount; i++) {
-            Enemy enemy = new Enemy(30, 5, 1.5, triggerX + i * 32, triggerY);
+            Enemy enemy = new Enemy(triggerX + i * ENEMY_SPACING, triggerY);
             entities.add(enemy);
             spawnedEnemies.add(enemy);
         }

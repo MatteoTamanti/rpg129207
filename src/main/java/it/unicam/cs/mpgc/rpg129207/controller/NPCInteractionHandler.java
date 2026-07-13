@@ -30,9 +30,7 @@ public class NPCInteractionHandler {
 
         for (Entity e : entities) {
             if (e instanceof NPC npc) {
-                double dx = npc.getX() - player.getX();
-                double dy = npc.getY() - player.getY();
-                double distance = Math.sqrt(dx * dx + dy * dy);
+                double distance = player.distanceTo(npc);
 
                 if (distance < nearestDistance) {
                     nearestDistance = distance;

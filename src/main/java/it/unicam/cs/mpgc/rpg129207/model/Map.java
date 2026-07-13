@@ -4,17 +4,17 @@ import java.io.Serializable;
 
 public class Map implements Serializable {
     private static final long serialVersionUID = 1L;
+    private static final int DEFAULT_TILE_SIZE = 32;
 
-    private TileType[][] matrix;
-    private int mapX;
-    private int mapY;
-    private int tileSize;
-
+    private final TileType[][] matrix;
+    private final int mapX;
+    private final int mapY;
+    private final int tileSize;
 
     public Map(int mapX, int mapY) {
         this.mapX = mapX;
         this.mapY = mapY;
-        this.tileSize = 32;
+        this.tileSize = DEFAULT_TILE_SIZE;
         this.matrix = new TileType[mapY][mapX];
     }
 
